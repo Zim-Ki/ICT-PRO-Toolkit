@@ -1,0 +1,10 @@
+//@version=6
+indicator("ICT PRO Toolkit", overlay=true)
+
+//==================================================
+// ICT PRO TOOLKIT
+// Version : v0.1.0
+// Author  : Hiến + ChatGPT
+//==================================================
+
+// Project started.
