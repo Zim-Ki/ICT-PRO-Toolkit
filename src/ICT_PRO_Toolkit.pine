@@ -1,10 +1,114 @@
 //@version=6
-indicator("ICT PRO Toolkit", overlay=true)
-
-//==================================================
+//==================================================================================================
+//
 // ICT PRO TOOLKIT
 // Version : v0.1.0
-// Author  : Hiến + ChatGPT
-//==================================================
+//
+// Authors:
+// - Hiến
+// - ChatGPT
+//
+//==================================================================================================
 
-// Project started.
+indicator(
+     title = "ICT PRO Toolkit",
+     shorttitle = "ICT PRO",
+     overlay = true,
+     max_labels_count = 500,
+     max_lines_count = 500,
+     max_boxes_count = 500)
+
+//==================================================================================================
+// INPUTS
+//==================================================================================================
+
+groupStructure = "Structure"
+groupDisplay = "Display"
+
+swingLength = input.int(5, "Swing Length", minval = 2, maxval = 20, group = groupStructure)
+
+showSwing = input.bool(true, "Show Swing Labels", group = groupDisplay)
+showDashboard = input.bool(true, "Show Dashboard", group = groupDisplay)
+
+//==================================================================================================
+// COLORS
+//==================================================================================================
+
+bullColor = color.lime
+bearColor = color.red
+
+//==================================================================================================
+// SWING ENGINE
+//==================================================================================================
+
+pivotHigh = ta.pivothigh(high, swingLength, swingLength)
+pivotLow  = ta.pivotlow(low, swingLength, swingLength)
+
+var float lastHigh = na
+var float lastLow = na
+
+var string lastHighType = "-"
+var string lastLowType = "-"
+
+//----------------------
+// High
+//----------------------
+
+if not na(pivotHigh)
+
+    string highType = na(lastHigh) ? "H" : pivotHigh > lastHigh ? "HH" : "LH"
+
+    if showSwing
+        label.new(
+             bar_index - swingLength,
+             pivotHigh,
+             highType,
+             style = label.style_label_down,
+             color = highType == "HH" ? bullColor : bearColor,
+             textcolor = color.white)
+
+    lastHigh := pivotHigh
+    lastHighType := highType
+
+//----------------------
+// Low
+//----------------------
+
+if not na(pivotLow)
+
+    string lowType = na(lastLow) ? "L" : pivotLow > lastLow ? "HL" : "LL"
+
+    if showSwing
+        label.new(
+             bar_index - swingLength,
+             pivotLow,
+             lowType,
+             style = label.style_label_up,
+             color = lowType == "HL" ? bullColor : bearColor,
+             textcolor = color.white)
+
+    lastLow := pivotLow
+    lastLowType := lowType
+
+//==================================================================================================
+// DASHBOARD
+//==================================================================================================
+
+var table dash = table.new(position.top_right, 2, 5)
+
+if barstate.islast and showDashboard
+
+    table.cell(dash, 0, 0, "ICT PRO")
+    table.cell(dash, 1, 0, "v0.1.0")
+
+    table.cell(dash, 0, 1, "Swing Len")
+    table.cell(dash, 1, 1, str.tostring(swingLength))
+
+    table.cell(dash, 0, 2, "Last High")
+    table.cell(dash, 1, 2, lastHighType)
+
+    table.cell(dash, 0, 3, "Last Low")
+    table.cell(dash, 1, 3, lastLowType)
+
+    table.cell(dash, 0, 4, "Status")
+    table.cell(dash, 1, 4, "Running")
